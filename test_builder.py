@@ -22,9 +22,7 @@ import sys
 
 import builder
 
-
-def touch(target, reqs):
-    return builder.cmd('touch', target)
+touch = builder.touch
 
 
 class TestBuilderTest(unittest.TestCase):
@@ -61,13 +59,13 @@ class TestBuilderTest(unittest.TestCase):
 
     def test_rule(self):
         self.time = {'target': -1, 'req': 1}
-        builder.rule('target', touch, 'req')
+        builder.rule('target', touch(), 'req')
         self.assertTrue(builder.build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
 
     def test_empty(self):
         self.time = {'target': -1}
-        builder.rule('target', touch)
+        builder.rule('target', touch())
         self.assertTrue(builder.build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
 
@@ -77,7 +75,7 @@ class TestBuilderTest(unittest.TestCase):
 
     def test_complex(self):
         self.time = {'target': -1, 'req': [-1, 1]}
-        builder.rule('target', touch, 'req')
+        builder.rule('target', touch(), 'req')
         builder.rule('req', touch)
         self.assertTrue(builder.build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
@@ -86,12 +84,12 @@ class TestBuilderTest(unittest.TestCase):
         self.assertFalse(builder.build_target('target'))
 
     def test_unknown_dep(self):
-        builder.rule('target', touch, 'req')
+        builder.rule('target', touch(), 'req')
         self.assertFalse(builder.build_target('target'))
 
     def test_already_built(self):
         self.time = {'target': 1}
-        builder.rule('target', touch)
+        builder.rule('target', touch())
         self.assertTrue(builder.build_target('target'))
 
     def test_mtime(self):
@@ -119,7 +117,7 @@ class TestBuilderTest(unittest.TestCase):
 
     def test_process_targets(self):
         args = sys.argv
-        builder.rule('target', touch)
+        builder.rule('target', touch())
         sys.argv = ['make', 'target']
         self.assertEqual(builder.process_targets(), 0)
         sys.argv = args
@@ -127,7 +125,7 @@ class TestBuilderTest(unittest.TestCase):
 
     def test_process_default_target(self):
         args = sys.argv
-        builder.rule('target', touch)
+        builder.rule('target', touch())
         sys.argv = ['make', ]
         self.assertEqual(builder.process_targets(), 0)
         sys.argv = args

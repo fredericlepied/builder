@@ -16,7 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from builder import process_targets, rule, run, init_vars
+from builder import process_targets, rule, run, init_vars, touch
 
 VERSION = '1'
 
@@ -24,8 +24,8 @@ init_vars()
 
 rule('version', run('@echo', VERSION))
 rule('all', None, 'req', 'target')
-rule('target', run('touch target'), 'req')
-rule('req', run('touch req'))
+rule('target', touch(), 'req')
+rule('req', touch())
 rule('fail', run('false'))
 rule('clean', run('-rm -f target req'))
 

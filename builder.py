@@ -125,6 +125,19 @@ are split according to space to allow to pass a list or a string with spaces.
     return do_run
 
 
+def touch(*args):
+    '''Return a function that will touch its argument or if called without
+argument, it will touch the target.
+'''
+    if len(args) == 0:
+        def do_touch(target, _reqs):
+            '''Touch the target.'''
+            return cmd('touch', target)
+        return do_touch
+    else:
+        return run('touch', *args)
+
+
 def process_targets():
     '''Satisfy the targets passed on the command line or start with the first
 target defined in the rules file.
