@@ -20,9 +20,9 @@ import tempfile
 import unittest
 import sys
 
+from builder import build_target, process_targets, process_vars, \
+    rule, run, touch
 import builder
-
-touch = builder.touch
 
 
 class TestBuilderTest(unittest.TestCase):
@@ -59,38 +59,38 @@ class TestBuilderTest(unittest.TestCase):
 
     def test_rule(self):
         self.time = {'target': -1, 'req': 1}
-        builder.rule('target', touch(), 'req')
-        self.assertTrue(builder.build_target('target'))
+        rule('target', touch(), 'req')
+        self.assertTrue(build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
 
     def test_empty(self):
         self.time = {'target': -1}
-        builder.rule('target', touch())
-        self.assertTrue(builder.build_target('target'))
+        rule('target', touch())
+        self.assertTrue(build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
 
     def test_first(self):
-        builder.rule('target', ('req',), touch)
+        rule('target', ('req',), touch)
         self.assertEqual(builder._FIRST, 'target')
 
     def test_complex(self):
         self.time = {'target': -1, 'req': [-1, 1]}
-        builder.rule('target', touch(), 'req')
-        builder.rule('req', touch)
-        self.assertTrue(builder.build_target('target'))
+        rule('target', touch(), 'req')
+        rule('req', touch)
+        self.assertTrue(build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
 
     def test_unknown_target(self):
-        self.assertFalse(builder.build_target('target'))
+        self.assertFalse(build_target('target'))
 
     def test_unknown_dep(self):
-        builder.rule('target', touch(), 'req')
-        self.assertFalse(builder.build_target('target'))
+        rule('target', touch(), 'req')
+        self.assertFalse(build_target('target'))
 
     def test_already_built(self):
         self.time = {'target': 1}
-        builder.rule('target', touch())
-        self.assertTrue(builder.build_target('target'))
+        rule('target', touch())
+        self.assertTrue(build_target('target'))
 
     def test_mtime(self):
         temp = tempfile.NamedTemporaryFile()
@@ -111,52 +111,52 @@ class TestBuilderTest(unittest.TestCase):
 
     def test_run(self):
         self.time = {'target': -1}
-        builder.rule('target', builder.run('touch', 'target'))
-        self.assertTrue(builder.build_target('target'))
+        rule('target', run('touch', 'target'))
+        self.assertTrue(build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
 
     def test_process_targets(self):
         args = sys.argv
-        builder.rule('target', touch())
+        rule('target', touch())
         sys.argv = ['make', 'target']
-        self.assertEqual(builder.process_targets(), 0)
+        self.assertEqual(process_targets(), 0)
         sys.argv = args
         self.assertEqual(self.run_cmd, 'touch target')
 
     def test_process_default_target(self):
         args = sys.argv
-        builder.rule('target', touch())
+        rule('target', touch())
         sys.argv = ['make', ]
-        self.assertEqual(builder.process_targets(), 0)
+        self.assertEqual(process_targets(), 0)
         sys.argv = args
         self.assertEqual(self.run_cmd, 'touch target')
 
     def test_process_no_target(self):
         args = sys.argv
         sys.argv = ['make', ]
-        self.assertEqual(builder.process_targets(), 1)
+        self.assertEqual(process_targets(), 1)
         sys.argv = args
 
     def test_process_failed_target(self):
         args = sys.argv
         # run the real cmd to have the right exit status
         builder.cmd = self.cmd
-        builder.rule('target', builder.run('false'))
+        rule('target', run('false'))
         sys.argv = ['make', 'target']
-        self.assertEqual(builder.process_targets(), 1)
+        self.assertEqual(process_targets(), 1)
         sys.argv = args
 
     def test_process_failed_default_target(self):
         args = sys.argv
         # run the real cmd to have the right exit status
         builder.cmd = self.cmd
-        builder.rule('target', builder.run('false'))
+        rule('target', run('false'))
         sys.argv = ['make', ]
-        self.assertEqual(builder.process_targets(), 1)
+        self.assertEqual(process_targets(), 1)
         sys.argv = args
 
     def test_process_vars(self):
-        self.assertEqual(builder.process_vars([]), [])
+        self.assertEqual(process_vars([]), [])
 
 if __name__ == "__main__":
     unittest.main()
