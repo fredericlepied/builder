@@ -18,6 +18,7 @@
 import os.path
 import tempfile
 import unittest
+import sys
 
 import builder
 
@@ -115,6 +116,49 @@ class TestBuilderTest(unittest.TestCase):
         builder.rule('target', builder.run('touch', 'target'))
         self.assertTrue(builder.build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
+
+    def test_process_targets(self):
+        args = sys.argv
+        builder.rule('target', touch)
+        sys.argv = ['make', 'target']
+        self.assertEqual(builder.process_targets(), 0)
+        sys.argv = args
+        self.assertEqual(self.run_cmd, 'touch target')
+
+    def test_process_default_target(self):
+        args = sys.argv
+        builder.rule('target', touch)
+        sys.argv = ['make', ]
+        self.assertEqual(builder.process_targets(), 0)
+        sys.argv = args
+        self.assertEqual(self.run_cmd, 'touch target')
+
+    def test_process_no_target(self):
+        args = sys.argv
+        sys.argv = ['make', ]
+        self.assertEqual(builder.process_targets(), 1)
+        sys.argv = args
+
+    def test_process_failed_target(self):
+        args = sys.argv
+        # run the real cmd to have the right exit status
+        builder.cmd = self.cmd
+        builder.rule('target', builder.run('false'))
+        sys.argv = ['make', 'target']
+        self.assertEqual(builder.process_targets(), 1)
+        sys.argv = args
+
+    def test_process_failed_default_target(self):
+        args = sys.argv
+        # run the real cmd to have the right exit status
+        builder.cmd = self.cmd
+        builder.rule('target', builder.run('false'))
+        sys.argv = ['make', ]
+        self.assertEqual(builder.process_targets(), 1)
+        sys.argv = args
+
+    def test_process_vars(self):
+        self.assertEqual(builder.process_vars([]), [])
 
 if __name__ == "__main__":
     unittest.main()
