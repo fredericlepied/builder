@@ -165,6 +165,11 @@ VAR=VAL) and return the list without these entries.
     for var in [x for x in args if '=' in x]:
         key, val = var.split('=')
         glob[key] = val
+
+    for key in glob:
+        if isinstance(glob[key], basestring):
+            os.environ[key] = glob[key]
+
     return [x for x in args if '=' not in x]
 
 

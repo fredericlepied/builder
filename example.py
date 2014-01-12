@@ -27,6 +27,7 @@ rule('all', None, 'req', 'target')
 rule('target', touch(), 'req')
 rule('req', touch())
 rule('fail', run('false'))
+rule('env', run('env'))
 rule('clean', run('-rm -f target req'))
 
 process_targets()
