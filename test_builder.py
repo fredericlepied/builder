@@ -149,7 +149,7 @@ class TestBuilderTest(unittest.TestCase):
         args = sys.argv
         # run the real cmd to have the right exit status
         builder.cmd = self.cmd
-        rule('target', run('false'))
+        rule('target', run('@false'))
         sys.argv = ['make', ]
         self.assertEqual(process_targets(), 1)
         sys.argv = args
@@ -161,6 +161,12 @@ class TestBuilderTest(unittest.TestCase):
         rule('target', steps(touch()))
         self.assertTrue(build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
+
+    def test_ignore_result(self):
+        # run the real cmd to have the right exit status
+        builder.cmd = self.cmd
+        rule('target', steps(run('-false')))
+        self.assertTrue(build_target('target'))
 
 if __name__ == "__main__":
     unittest.main()
