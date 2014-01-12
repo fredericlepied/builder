@@ -138,6 +138,18 @@ argument, it will touch the target.
         return run('touch', *args)
 
 
+def steps(*lsteps):
+    '''Return a function that run all the steps passed in argument
+sequentially. If one step fails, it returns ``False``.
+'''
+    def do_steps(target, reqs):
+        for step in lsteps:
+            if not step(target, reqs):
+                return False
+        return True
+    return do_steps
+
+
 def process_targets():
     '''Satisfy the targets passed on the command line or start with the first
 target defined in the rules file.

@@ -21,7 +21,7 @@ import unittest
 import sys
 
 from builder import build_target, process_targets, process_vars, \
-    rule, run, touch
+    rule, run, steps, touch
 import builder
 
 
@@ -110,7 +110,6 @@ class TestBuilderTest(unittest.TestCase):
         self.assertFalse(self.cmd('false'))
 
     def test_run(self):
-        self.time = {'target': -1}
         rule('target', run('touch', 'target'))
         self.assertTrue(build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
@@ -157,6 +156,11 @@ class TestBuilderTest(unittest.TestCase):
 
     def test_process_vars(self):
         self.assertEqual(process_vars([]), [])
+
+    def test_steps(self):
+        rule('target', steps(touch()))
+        self.assertTrue(build_target('target'))
+        self.assertEqual(self.run_cmd, 'touch target')
 
 if __name__ == "__main__":
     unittest.main()
