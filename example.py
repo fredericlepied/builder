@@ -22,8 +22,12 @@ VERSION = '1'
 
 init_vars()
 
-rule('version', run('echo', VERSION))
-rule('clean', run('rm -f target req'))
+rule('version', run('@echo', VERSION))
+rule('all', None, 'req', 'target')
+rule('target', run('touch target'), 'req')
+rule('req', run('touch req'))
+rule('fail', run('false'))
+rule('clean', run('-rm -f target req'))
 
 process_targets()
 

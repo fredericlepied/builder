@@ -89,12 +89,25 @@ def cmd(*args):
     '''Build the command from ``args``. Then display it before displaying its
 output. Return ``True`` if the command exists with 0 or ``False`` for other
 values.
+
+If the command starts with @, the command is not discplayed.
+
+If the command starts with -, its exit status is ignored.
 '''
     cmdline = ' '.join(args)
-    sys.stderr.write('+ %s\n' % cmdline)
+    ignore_failure = False
+    if cmdline[0] == '-':
+        ignore_failure = True
+        cmdline = cmdline[1:]
+    command_output = True
+    if cmdline[0] == '@':
+        command_output = False
+        cmdline = cmdline[1:]
+    if command_output:
+        sys.stderr.write('+ %s\n' % cmdline)
     status, output = commands.getstatusoutput(cmdline)
     print(output)
-    if status != 0:
+    if not ignore_failure and status != 0:
         sys.stderr.write('*** Error %d\n' % status)
         return False
     return True
