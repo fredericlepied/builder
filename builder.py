@@ -20,9 +20,10 @@ tool using the power of the Python language to be able to build more
 sophisticated rules.
 '''
 
-import commands
 import inspect
 import os.path
+import select
+import subprocess
 import sys
 
 
@@ -94,23 +95,48 @@ If the command starts with @, the command is not discplayed.
 
 If the command starts with -, its exit status is ignored.
 '''
-    cmdline = ' '.join(args)
     ignore_failure = False
-    if cmdline[0] == '-':
+    args = list(args)
+    if args[0][0] == '-':
         ignore_failure = True
-        cmdline = cmdline[1:]
+        args[0] = args[0][1:]
     command_output = True
-    if cmdline[0] == '@':
+    if args[0][0] == '@':
         command_output = False
-        cmdline = cmdline[1:]
+        args[0] = args[0][1:]
     if command_output:
-        sys.stderr.write('+ %s\n' % cmdline)
-    status, output = commands.getstatusoutput(cmdline)
-    print(output)
+        sys.stderr.write('+ %s\n' % ' '.join(args))
+    status = run_command(args)
     if not ignore_failure and status != 0:
         sys.stderr.write('*** Error %d\n' % status)
         return False
     return True
+
+
+def run_command(args):
+    '''Run a command incrementaly displaying its standard
+and error outputs.
+'''
+    pipe = subprocess.Popen(args,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+
+    inputs, _, _ = select.select([pipe.stdout, pipe.stderr], (), ())
+    while inputs != []:
+        if pipe.stdout in inputs:
+            chars = pipe.stdout.read(1)
+            if chars != '':
+                sys.stdout.write(chars)
+            else:
+                break
+        if pipe.stderr in inputs:
+            chars = pipe.stderr.read(1)
+            if chars != '':
+                sys.stderr.write(chars)
+            else:
+                sys.stderr.close()
+        inputs, _, _ = select.select([pipe.stdout, pipe.stderr], (), ())
+    return pipe.wait()
 
 
 def run(*args):
