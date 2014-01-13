@@ -1,1 +1,1 @@
-include test_builder.py example.py
+include test_builder.py example.py README.rst
