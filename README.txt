@@ -1,7 +1,7 @@
 builder
 =======
 
-builder is a python module to build Makefile like script in Python.
+builder is a python module to build Makefile like scripts in Python.
 
 Here is an example called example.py::
 
