@@ -176,7 +176,7 @@ sequentially. If one step fails, it returns ``False``.
     return do_steps
 
 
-def process_targets():
+def end_rules():
     '''Satisfy the targets passed on the command line or start with the first
 target defined in the rules file.
 
@@ -205,13 +205,13 @@ VAR=VAL) and return the list without these entries.
         glob[key] = val
 
     for key in glob:
-        if isinstance(glob[key], basestring):
+        if isinstance(glob[key], str):
             os.environ[key] = glob[key]
 
     return [x for x in args if '=' not in x]
 
 
-def init_vars():
+def end_vars():
     '''Process variable on the command line (in the form VAR=VAL) and inject
 them in the  globals of the top level frame. The sys.argv is changed by
 removing the variable arguments.

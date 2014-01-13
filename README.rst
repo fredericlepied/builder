@@ -7,11 +7,11 @@ Here is an example called example.py::
 
   #!/usr/bin/env python
   
-  from builder import process_targets, rule, run, init_vars, touch
+  from builder import end_rules, rule, run, end_vars, touch
   
   VERSION = '1'
   
-  init_vars()
+  end_vars()
   
   rule('version', run('@echo', VERSION))
   rule('all', None, 'req', 'target')
@@ -21,12 +21,12 @@ Here is an example called example.py::
   rule('env', run('env'))
   rule('clean', run('-rm -f target req'))
   
-  process_targets()
+  end_rules()
 
 There are 2 parts in all such scripts:
 
-1. the definition of variables closed by the ``init_vars()`` call.
-2. the definition of rules for building targets closed by the ``process_targets()`` call.
+1. the definition of variables closed by the ``end_vars()`` call.
+2. the definition of rules for building targets closed by the ``end_rules()`` call.
 
 You can then call the script like this::
 
@@ -48,6 +48,7 @@ name and overload the variable ``VERSION`` to 12.
    * ``touch`` create the files given in argument or the target if no
      argument is given. If the files already exist, the modification
      time is updated to the current time.
+   * ``steps`` to execute multipe steps for a rule.
 
 The remaining optional arguments are the target dependencies.
 

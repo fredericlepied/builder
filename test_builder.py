@@ -20,7 +20,7 @@ import tempfile
 import unittest
 import sys
 
-from builder import build_target, process_targets, process_vars, \
+from builder import build_target, end_rules, process_vars, \
     rule, run, steps, touch
 import builder
 
@@ -114,11 +114,11 @@ class TestBuilderTest(unittest.TestCase):
         self.assertTrue(build_target('target'))
         self.assertEqual(self.run_cmd, 'touch target')
 
-    def test_process_targets(self):
+    def test_end_rules(self):
         args = sys.argv
         rule('target', touch())
         sys.argv = ['make', 'target']
-        self.assertEqual(process_targets(), 0)
+        self.assertEqual(end_rules(), 0)
         sys.argv = args
         self.assertEqual(self.run_cmd, 'touch target')
 
@@ -126,14 +126,14 @@ class TestBuilderTest(unittest.TestCase):
         args = sys.argv
         rule('target', touch())
         sys.argv = ['make', ]
-        self.assertEqual(process_targets(), 0)
+        self.assertEqual(end_rules(), 0)
         sys.argv = args
         self.assertEqual(self.run_cmd, 'touch target')
 
     def test_process_no_target(self):
         args = sys.argv
         sys.argv = ['make', ]
-        self.assertEqual(process_targets(), 1)
+        self.assertEqual(end_rules(), 1)
         sys.argv = args
 
     def test_process_failed_target(self):
@@ -142,7 +142,7 @@ class TestBuilderTest(unittest.TestCase):
         builder.cmd = self.cmd
         rule('target', run('false'))
         sys.argv = ['make', 'target']
-        self.assertEqual(process_targets(), 1)
+        self.assertEqual(end_rules(), 1)
         sys.argv = args
 
     def test_process_failed_default_target(self):
@@ -151,7 +151,7 @@ class TestBuilderTest(unittest.TestCase):
         builder.cmd = self.cmd
         rule('target', run('@false'))
         sys.argv = ['make', ]
-        self.assertEqual(process_targets(), 1)
+        self.assertEqual(end_rules(), 1)
         sys.argv = args
 
     def test_process_vars(self):

@@ -16,11 +16,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from builder import process_targets, rule, run, init_vars, touch
+from builder import end_rules, rule, run, end_vars, touch
 
 VERSION = '1'
 
-init_vars()
+end_vars()
 
 rule('version', run('@echo', VERSION))
 rule('all', None, 'req', 'target')
@@ -30,6 +30,6 @@ rule('fail', run('false'))
 rule('env', run('env'))
 rule('clean', run('-rm -f target req'))
 
-process_targets()
+end_rules()
 
 # example.py ends here
