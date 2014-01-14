@@ -44,7 +44,9 @@ name and overload the variable ``VERSION`` to 12.
    dependencies. Predefined functions are available to simplify
    development:
 
-   * ``run`` execute the given command.
+   * ``run`` execute the given command. If the command starts with an
+     ``@`` then don't output the command. If the command starts with
+     ``-`` then ignore its exit status.
    * ``touch`` create the files given in argument or the target if no
      argument is given. If the files already exist, the modification
      time is updated to the current time.
