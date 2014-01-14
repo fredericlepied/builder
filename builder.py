@@ -22,6 +22,7 @@ sophisticated rules.
 
 import inspect
 import os.path
+import re
 import select
 import subprocess
 import sys
@@ -51,10 +52,14 @@ These calls must be done between calls to ``init_vars`` and
 '''
     global _FIRST
 
+    glob = inspect.stack()[-1][0].f_globals
+
+    target = subst_vars(glob, target)
+
     if not _FIRST:
         _FIRST = target
 
-    _RULES[target] = (reqs, build)
+    _RULES[target] = ([subst_vars(glob, x) for x in reqs], build)
 
 
 def build_target(target):
@@ -86,6 +91,22 @@ and the target recursively.
         return False
 
 
+VAR_REGEXP = re.compile(r'\$\(([^)]+)\)')
+
+
+def subst_vars(arr, string):
+    '''Substitute variable in the form $(VAR) from the ``arr`` argument.'''
+    substs = []
+    for match in VAR_REGEXP.finditer(string):
+        substs.insert(0,
+                      (match.start(),
+                       match.end(),
+                       arr.get(match.group(1), '')))
+    for subst in substs:
+        string = string[0:subst[0]] + subst[2] + string[subst[1]:]
+    return string
+
+
 def cmd(*args):
     '''Build the command from ``args``. Then display it before displaying its
 output. Return ``True`` if the command exists with 0 or ``False`` for other
@@ -106,7 +127,8 @@ If the command starts with -, its exit status is ignored.
         args[0] = args[0][1:]
     if command_output:
         sys.stderr.write('+ %s\n' % ' '.join(args))
-    status = run_command(args)
+    glob = inspect.stack()[-1][0].f_globals
+    status = run_command([subst_vars(glob, x) for x in args])
     if not ignore_failure and status != 0:
         sys.stderr.write('*** Error %d\n' % status)
         return False
@@ -169,6 +191,7 @@ def steps(*lsteps):
 sequentially. If one step fails, it returns ``False``.
 '''
     def do_steps(target, reqs):
+        '''run multiple functions in sequence.'''
         for step in lsteps:
             if not step(target, reqs):
                 return False

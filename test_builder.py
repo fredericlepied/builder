@@ -21,7 +21,7 @@ import unittest
 import sys
 
 from builder import build_target, end_rules, process_vars, \
-    rule, run, steps, touch
+    rule, run, steps, subst_vars, touch
 import builder
 
 
@@ -70,7 +70,7 @@ class TestBuilderTest(unittest.TestCase):
         self.assertEqual(self.run_cmd, 'touch target')
 
     def test_first(self):
-        rule('target', ('req',), touch)
+        rule('target', None)
         self.assertEqual(builder._FIRST, 'target')
 
     def test_complex(self):
@@ -167,6 +167,13 @@ class TestBuilderTest(unittest.TestCase):
         builder.cmd = self.cmd
         rule('target', steps(run('-false')))
         self.assertTrue(build_target('target'))
+
+    def test_subst_vars_none(self):
+        self.assertEqual(subst_vars({}, 'string'), 'string')
+
+    def test_subst_vars_non_exist(self):
+        self.assertEqual(subst_vars({'var': 'val'}, '$(var)$(var2)ue'),
+                         'value')
 
 if __name__ == "__main__":
     unittest.main()

@@ -22,7 +22,7 @@ VERSION = '1'
 
 end_vars()
 
-rule('version', run('@echo', VERSION))
+rule('version', run('@echo $(VERSION)'))
 rule('all', None, 'req', 'target')
 rule('target', touch(), 'req')
 rule('req', touch())
