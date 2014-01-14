@@ -1,6 +1,14 @@
 builder
 =======
 
+.. image:: https://secure.travis-ci.org/fredericlepied/pybuilder.png?branch=master
+   +   :alt: Build Status
+   +   :target: http://travis-ci.org/fredericlepied/builder
+
+.. image:: https://coveralls.io/repos/fredericlepied/builder/badge.png?branch=master
+   +   :alt: Coverage Status
+   +   :target: https://coveralls.io/r/fredericlepied/builder?branch=master
+
 builder is a python module to build Makefile like scripts in Python.
 
 Here is an example called example.py::
@@ -13,7 +21,7 @@ Here is an example called example.py::
   
   end_vars()
   
-  rule('version', run('@echo', VERSION))
+  rule('version', run('@echo $(VERSION)'))
   rule('all', None, 'req', 'target')
   rule('target', touch(), 'req')
   rule('req', touch())
