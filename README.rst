@@ -5,6 +5,10 @@ builder
    :alt: Build Status
    :target: http://travis-ci.org/fredericlepied/builder
 
+.. image:: https://badge.fury.io/py/builder.png
+   :alt: PyPI version
+   :target: http://badge.fury.io/py/builder
+
 .. image:: https://coveralls.io/repos/fredericlepied/builder/badge.png?branch=master
    :alt: Coverage Status
    :target: https://coveralls.io/r/fredericlepied/builder?branch=master
