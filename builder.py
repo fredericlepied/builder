@@ -21,6 +21,7 @@ sophisticated rules.
 '''
 
 import inspect
+import os
 import os.path
 import re
 import select
@@ -143,21 +144,23 @@ and error outputs.
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
 
-    inputs, _, _ = select.select([pipe.stdout, pipe.stderr], (), ())
-    while inputs != []:
+    inputset = [pipe.stdout, pipe.stderr]
+    while inputset != []:
+        inputs, _, _ = select.select(inputset, (), ())
         if pipe.stdout in inputs:
-            chars = pipe.stdout.read(1)
-            if chars != '':
-                sys.stdout.write(chars)
+            chars = os.read(pipe.stdout.fileno(), 1024)
+            if chars and chars != '':
+                sys.stdout.write(chars.decode('ascii'))
             else:
-                break
+                pipe.stdout.close()
+                inputset.remove(pipe.stdout)
         if pipe.stderr in inputs:
-            chars = pipe.stderr.read(1)
-            if chars != '':
-                sys.stderr.write(chars)
+            chars = os.read(pipe.stderr.fileno(), 1024)
+            if chars and chars != '':
+                sys.stderr.write(chars.decode('ascii'))
             else:
-                sys.stderr.close()
-        inputs, _, _ = select.select([pipe.stdout, pipe.stderr], (), ())
+                pipe.stderr.close()
+                inputset.remove(pipe.stderr)
     return pipe.wait()
 
 
