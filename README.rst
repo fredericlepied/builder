@@ -1,13 +1,13 @@
 builder
 =======
 
-.. image:: https://secure.travis-ci.org/fredericlepied/pybuilder.png?branch=master
-   +   :alt: Build Status
-   +   :target: http://travis-ci.org/fredericlepied/builder
+.. image:: https://secure.travis-ci.org/fredericlepied/builder.png?branch=master
+   :alt: Build Status
+   :target: http://travis-ci.org/fredericlepied/builder
 
 .. image:: https://coveralls.io/repos/fredericlepied/builder/badge.png?branch=master
-   +   :alt: Coverage Status
-   +   :target: https://coveralls.io/r/fredericlepied/builder?branch=master
+   :alt: Coverage Status
+   :target: https://coveralls.io/r/fredericlepied/builder?branch=master
 
 builder is a python module to build Makefile like scripts in Python.
 
